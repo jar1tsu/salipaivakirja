@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Kirjaudu sisään</title>
+    <style>
+        body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+    </style>
+</head>
+<body>
+    <h1>Kirjaudu sisään</h1>
+
+    <div th:if="${param.error}">
+        <p style="color: red;">Virheellinen käyttäjätunnus tai salasana.</p>
+    </div>
+
+    <div th:if="${param.logout}">
+        <p style="color: green;">Olet kirjautunut ulos.</p>
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <p>Ei vielä tunnuksia? <a th:href="@{/register}">Rekisteröidy</a></p>
+        <div>
+            <label for="username">Käyttäjätunnus:</label>
+            <input type="text" id="username" name="username" required />
+        </div>
+        <div>
+            <label for="password">Salasana:</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+        <div>
+            <button type="submit">Kirjaudu</button>
+        </div>
+    </form>
+</body>
+</html>

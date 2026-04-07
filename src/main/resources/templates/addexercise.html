@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lisää harjoitus</title>
+    <style>
+        body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+        .sarja { border: 1px solid #ddd; padding: 1rem; margin-bottom: 0.5rem; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+<h1>Lisää uusi harjoitus</h1>
+<p>
+    <a th:href="@{/exercises}">← Takaisin harjoituksiin</a>
+</p>
+
+<form th:action="@{/exercises/save}" method="post">
+    <div>
+        <label for="name">Nimi:</label>
+        <input type="text" id="name" name="name" required />
+    </div>
+    <div>
+        <label for="workoutId">Treeni:</label>
+        <select id="workoutId" name="workoutId">
+            <option th:each="w : ${workouts}"
+                    th:value="${w.id}"
+                    th:text="${w.date}">
+            </option>
+        </select>
+    </div>
+    <div>
+        <label for="muscleGroupId">Lihasryhmä:</label>
+        <select id="muscleGroupId" name="muscleGroupId">
+            <option th:each="mg : ${muscleGroups}"
+                    th:value="${mg.id}"
+                    th:text="${mg.name}">
+            </option>
+        </select>
+    </div>
+
+    <h3>Sarjat</h3>
+    <div id="sarjat">
+        <div class="sarja">
+            <strong>Sarja 1</strong>
+            <div>
+                <label>Paino (kg):</label>
+                <input type="number" name="weights" step="0.5" min="0" value="0" required />
+            </div>
+            <div>
+                <label>Toistot:</label>
+                <input type="number" name="reps" min="1" value="10" required />
+            </div>
+        </div>
+    </div>
+
+    <button type="button" onclick="lisaaSarja()">+ Lisää sarja</button>
+
+    <input type="hidden" name="workoutId" th:value="${workoutId}" />
+
+    <div style="margin-top: 1rem;">
+        <button type="submit">Tallenna</button>
+        <a th:href="@{/exercises}">Peruuta</a>
+    </div>
+</form>
+
+<script>
+let sarjaLkm = 1;
+function lisaaSarja() {
+    sarjaLkm++;
+    const div = document.createElement('div');
+    div.className = 'sarja';
+    div.innerHTML = `
+        <strong>Sarja ${sarjaLkm}</strong>
+        <div>
+            <label>Paino (kg):</label>
+            <input type="number" name="weights" step="0.5" min="0" value="0" required />
+        </div>
+        <div>
+            <label>Toistot:</label>
+            <input type="number" name="reps" min="1" value="10" required />
+        </div>
+        <button type="button" onclick="this.parentElement.remove()">Poista</button>
+    `;
+    document.getElementById('sarjat').appendChild(div);
+}
+</script>
+
+</body>
+</html>

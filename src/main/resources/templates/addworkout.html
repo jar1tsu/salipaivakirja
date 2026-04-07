@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lisää treeni</title>
+    <style>
+        body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+    </style>
+</head>
+<body>
+
+<h1>Lisää uusi treeni</h1>
+
+<form th:action="@{/workouts/save}" th:object="${workout}" method="post">
+    <div>
+        <label for="date">Päivämäärä:</label>
+        <input type="date" id="date" th:field="*{date}" required />
+    </div>
+    <div>
+        <label for="durationMin">Kesto (min):</label>
+        <input type="number" id="durationMin" th:field="*{durationMin}" />
+    </div>
+    <div>
+        <label for="notes">Muistiinpanot:</label>
+        <input type="text" id="notes" th:field="*{notes}">
+    </div>
+    <div>
+        <button type="submit">Tallenna</button>
+        <a th:href="@{/workouts}">Peruuta</a>
+    </div>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fi"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <title>Treenit</title>
+    <style>
+        body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { padding: .5rem .75rem; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f7f7f7; }
+    </style>
+</head>
+<body>
+
+<p>
+    Hei, <span th:text="${username}"></span> (id: <span th:text="${userId}"></span>)!
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit">Kirjaudu ulos</button>
+    </form>
+</p>
+
+<h1>Treenit</h1>
+
+<p>
+    <a th:href="@{/workouts/add}">Lisää uusi treeni</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Päivämäärä</th>
+            <th>Kesto (min)</th>
+            <th>Muistiinpanot</th>
+            <th>Toiminnot</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="w : ${workouts}">
+            <td th:text="${w.date}"></td>
+            <td th:text="${w.durationMin}"></td>
+            <td th:text="${w.notes}"></td>
+            <td>
+                <a th:href="@{'/exercises?workoutId=' + ${w.id}}">Harjoitukset</a>
+                <a th:href="@{'/workouts/edit/' + ${w.id}}">Muokkaa</a>
+
+                <a th:href="@{'/workouts/delete/' + ${w.id}}"
+                   th:data-title="${w.date}"
+                   onclick="return confirm('Haluatko varmasti poistaa treenin \'' + this.dataset.title + '\'?');">
+                   Poista
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

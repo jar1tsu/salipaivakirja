@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fi"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <title>Harjoitukset</title>
+    <style>
+        body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { padding: .5rem .75rem; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f7f7f7; }
+    </style>
+</head>
+<body>
+
+<p>
+    Hei, <span th:text="${username}"></span> (id: <span th:text="${userId}"></span>)!
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit">Kirjaudu ulos</button>
+    </form>
+</p>
+
+<h1>Harjoitukset</h1>
+<p>
+    <a th:href="@{/workouts}">← Takaisin treeneihin</a>
+</p>
+
+<p>
+    <a th:href="@{/exercises/add}">Lisää uusi harjoitus</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nimi</th>
+            <th>Treeni</th>
+            <th>Lihasryhmät</th>
+            <th>Sarjat</th>
+            <th>Toiminnot</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr th:each="e : ${exercises}">
+            <td th:text="${e.name}"></td>
+            <td th:text="${e.workout != null ? e.workout.date : ''}"></td>
+            <td>
+                <span th:each="mg, iter : ${e.muscleGroups}">
+                    <span th:text="${mg.muscleGroup.name}"></span>
+                    <span th:if="${!iter.last}">, </span>
+                </span>
+            </td>
+            <td>
+                <div th:each="set : ${e.exerciseSets}">
+                    Sarja <span th:text="${set.setNumber}"></span>:
+                    <span th:text="${set.weight}"></span> kg x
+                    <span th:text="${set.reps}"></span> toistoa
+                </div>
+            </td>
+            <td>
+                <a th:href="@{'/exercises/edit/' + ${e.id}}">Muokkaa</a>
+                <a th:href="@{'/exercises/delete/' + ${e.id}}"
+                   th:data-title="${e.name}"
+                   onclick="return confirm('Haluatko varmasti poistaa harjoituksen \'' + this.dataset.title + '\'?');">
+                   Poista
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

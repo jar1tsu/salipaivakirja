@@ -3,6 +3,7 @@ package lopputyo.salipaivakirja.web;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,14 +47,14 @@ public class WorkoutRestController {
     }
 
     @PostMapping
-    public Workout addWorkout(@RequestBody Workout workout, Authentication auth) {
+    public Workout addWorkout(@Valid @RequestBody Workout workout, Authentication auth) {
         User user = userRepository.findByUsername(auth.getName());
         workout.setUser(user);
         return workoutRepository.save(workout);
     }
 
     @PutMapping("/{id}")
-    public Workout updateWorkout(@PathVariable Long id, @RequestBody Workout updatedWorkout, Authentication auth) {
+    public Workout updateWorkout(@PathVariable Long id, @Valid @RequestBody Workout updatedWorkout, Authentication auth) {
         User user = userRepository.findByUsername(auth.getName());
         updatedWorkout.setId(id);
         updatedWorkout.setUser(user);

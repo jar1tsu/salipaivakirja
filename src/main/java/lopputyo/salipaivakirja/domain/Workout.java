@@ -14,6 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Workout {
@@ -22,9 +24,11 @@ public class Workout {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotNull(message = "Päivämäärä ei saa olla tyhjä")
     @Column(nullable = false)
     private LocalDate date;
 
+    @Min(value = 1, message = "Keston täytyy olla vähintään 1 minuutti")
     private Integer durationMin;
 
     private String notes;

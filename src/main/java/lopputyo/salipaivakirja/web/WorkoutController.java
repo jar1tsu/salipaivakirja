@@ -4,11 +4,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import jakarta.validation.Valid;
 
 import lopputyo.salipaivakirja.domain.ExerciseRepository;
 import lopputyo.salipaivakirja.domain.User;
@@ -85,7 +88,10 @@ public class WorkoutController {
     }
 
     @PostMapping("/workouts/save")
-    public String saveWorkout(@ModelAttribute Workout workout, Authentication auth) {
+    public String saveWorkout(@Valid @ModelAttribute Workout workout, BindingResult result, Authentication auth) {
+        if (result.hasErrors()) {
+            return "addworkout";
+        }
         User user = userRepository.findByUsername(auth.getName());
         workout.setUser(user);
         workoutRepository.save(workout);
@@ -100,7 +106,10 @@ public class WorkoutController {
     }
 
     @PostMapping("/workouts/update/{id}")
-    public String updateWorkout(@PathVariable("id") Long id, @ModelAttribute("workout") Workout workout, Authentication auth) {
+    public String updateWorkout(@PathVariable("id") Long id, @Valid @ModelAttribute("workout") Workout workout, BindingResult result, Authentication auth) {
+        if (result.hasErrors()) {
+            return "editworkout";
+        }
         User user = userRepository.findByUsername(auth.getName());
         workout.setId(id);
         workout.setUser(user);

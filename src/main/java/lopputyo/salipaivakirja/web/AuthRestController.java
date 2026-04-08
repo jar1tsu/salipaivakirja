@@ -2,6 +2,7 @@ package lopputyo.salipaivakirja.web;
 
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,7 +32,8 @@ public class AuthRestController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody Map<String, String> request) {
+public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+    try {
         Authentication auth = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 request.get("username"),
@@ -39,8 +41,11 @@ public class AuthRestController {
             )
         );
         String token = jwtTokenProvider.generateToken(auth.getName());
-        return Map.of("token", token);
+        return ResponseEntity.ok(Map.of("token", token));
+    } catch (Exception e) {
+        return ResponseEntity.status(401).body(Map.of("error", "Väärä käyttäjätunnus tai salasana"));
     }
+}
 
     @PostMapping("/register")
     public Map<String, String> register(@RequestBody Map<String, String> request) {

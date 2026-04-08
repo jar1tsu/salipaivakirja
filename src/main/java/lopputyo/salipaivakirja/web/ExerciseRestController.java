@@ -70,8 +70,8 @@ public class ExerciseRestController {
         if (!existing.getWorkout().getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("Ei oikeuksia");
         }
-        updatedExercise.setId(id);
-        return exerciseRepository.save(updatedExercise);
+        existing.setName(updatedExercise.getName());
+        return exerciseRepository.save(existing);
     }
 
     @DeleteMapping("/{id}")

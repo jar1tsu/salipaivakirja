@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
@@ -12,10 +13,12 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenProvider {
 
-    private final SecretKey key = Keys.hmacShaKeyFor(
-        "salipaivakirja-secret-key-12345678901234567890".getBytes()
-    );
+    private final SecretKey key;
     private final long expiration = 864_000_000; // 24 tuntia
+
+    public JwtTokenProvider(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public String generateToken(String username) {
         return Jwts.builder()

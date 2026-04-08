@@ -31,13 +31,13 @@ public class SalipaivakirjaApplication {
 			}
 
 			if (!muscleGroupRepository.findAll().iterator().hasNext()) {
-            	muscleGroupRepository.save(new MuscleGroup("Rintalihas"));
-            	muscleGroupRepository.save(new MuscleGroup("Selkä"));
-            	muscleGroupRepository.save(new MuscleGroup("Hauislihas"));
-            	muscleGroupRepository.save(new MuscleGroup("Ojentajalihas"));
-            	muscleGroupRepository.save(new MuscleGroup("Olkapäät"));
-            	muscleGroupRepository.save(new MuscleGroup("Jalat"));
-            	muscleGroupRepository.save(new MuscleGroup("Vatsa"));
+            		muscleGroupRepository.save(new MuscleGroup("Rintalihas"));
+            		muscleGroupRepository.save(new MuscleGroup("Selkä"));
+            		muscleGroupRepository.save(new MuscleGroup("Hauislihas"));
+            		muscleGroupRepository.save(new MuscleGroup("Ojentajalihas"));
+            		muscleGroupRepository.save(new MuscleGroup("Olkapäät"));
+            		muscleGroupRepository.save(new MuscleGroup("Jalat"));
+            		muscleGroupRepository.save(new MuscleGroup("Vatsa"));
         	}
     	};
 	}

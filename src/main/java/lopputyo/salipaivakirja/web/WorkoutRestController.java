@@ -56,6 +56,10 @@ public class WorkoutRestController {
     @PutMapping("/{id}")
     public Workout updateWorkout(@PathVariable Long id, @Valid @RequestBody Workout updatedWorkout, Authentication auth) {
         User user = userRepository.findByUsername(auth.getName());
+        Workout existing = workoutRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ei löydy: " + id));
+        if (!existing.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("Ei oikeuksia muokata treeniä");
+        }
         updatedWorkout.setId(id);
         updatedWorkout.setUser(user);
         return workoutRepository.save(updatedWorkout);

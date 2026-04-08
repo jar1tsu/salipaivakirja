@@ -44,12 +44,26 @@ public class AuthRestController {
 
     @PostMapping("/register")
     public Map<String, String> register(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String password = request.get("password");
+        String email = request.get("email");
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Käyttäjätunnus ei saa olla tyhjä");
+        }
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Salasana ei saa olla tyhjä");
+        }
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Sähköposti ei saa olla tyhjä");
+        }
+
         String requestedRole = request.get("role");
         String role = "ROLE_COACH".equals(requestedRole) ? "ROLE_COACH" : "ROLE_USER";
         User user = new User(
-            request.get("username"),
-            passwordEncoder.encode(request.get("password")),
-            request.get("email"),
+            username,
+            passwordEncoder.encode(password),
+            email,
             role
         );
         userRepository.save(user);

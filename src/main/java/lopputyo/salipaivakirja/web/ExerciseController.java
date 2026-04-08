@@ -101,11 +101,28 @@ public class ExerciseController {
     }
 
     @PostMapping("/exercises/update/{id}")
-    public String updateExercise(@PathVariable("id") Long id, @ModelAttribute("exercise") Exercise updatedExercise, @RequestParam("workoutId") Long workoutId) {
-        updatedExercise.setId(id);
+    public String updateExercise(@PathVariable("id") Long id,
+            @RequestParam("name") String name,
+            @RequestParam("workoutId") Long workoutId,
+            @RequestParam(value = "setIds", required = false) List<Long> setIds,
+            @RequestParam(value = "weights", required = false) List<Double> weights,
+            @RequestParam(value = "reps", required = false) List<Integer> reps) {
+        Exercise exercise = exerciseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ei ole oikea Id:" + id));
         Workout workout = workoutRepository.findById(workoutId).orElseThrow(() -> new IllegalArgumentException("Ei ole oikea Id:" + workoutId));
-        updatedExercise.setWorkout(workout);
-        exerciseRepository.save(updatedExercise);
+        exercise.setName(name);
+        exercise.setWorkout(workout);
+        exerciseRepository.save(exercise);
+
+        if (setIds != null && weights != null && reps != null) {
+            for (int i = 0; i < setIds.size(); i++) {
+                ExerciseSet set = exerciseSetRepository.findById(setIds.get(i)).orElse(null);
+                if (set != null) {
+                    set.setWeight(weights.get(i));
+                    set.setReps(reps.get(i));
+                    exerciseSetRepository.save(set);
+                }
+            }
+        }
         return "redirect:/exercises?workoutId=" + workoutId;
     }
 

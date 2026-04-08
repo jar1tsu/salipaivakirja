@@ -62,6 +62,9 @@ public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Sähköposti ei saa olla tyhjä");
         }
+        if (userRepository.findByUsername(username) != null) {
+            throw new IllegalArgumentException("Käyttäjätunnus on jo käytössä");
+        }
 
         String requestedRole = request.get("role");
         String role = "ROLE_COACH".equals(requestedRole) ? "ROLE_COACH" : "ROLE_USER";

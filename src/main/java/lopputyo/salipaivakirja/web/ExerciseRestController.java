@@ -71,6 +71,9 @@ public class ExerciseRestController {
             throw new IllegalArgumentException("Ei oikeuksia");
         }
         existing.setName(updatedExercise.getName());
+        if (updatedExercise.getWorkout() != null) {
+            existing.setWorkout(updatedExercise.getWorkout());
+        }
         return exerciseRepository.save(existing);
     }
 

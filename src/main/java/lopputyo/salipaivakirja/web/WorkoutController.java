@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 
-import lopputyo.salipaivakirja.domain.ExerciseRepository;
 import lopputyo.salipaivakirja.domain.User;
 import lopputyo.salipaivakirja.domain.UserRepository;
 import lopputyo.salipaivakirja.domain.Workout;
@@ -25,13 +24,11 @@ public class WorkoutController {
     private final WorkoutRepository workoutRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ExerciseRepository exerciseRepository;
 
-    public WorkoutController(WorkoutRepository workoutRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ExerciseRepository exerciseRepository) {
+    public WorkoutController(WorkoutRepository workoutRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.exerciseRepository = exerciseRepository;
     }
 
     @GetMapping("/register")
@@ -99,8 +96,12 @@ public class WorkoutController {
     }
 
     @GetMapping("/workouts/edit/{id}")
-    public String editWorkout(@PathVariable("id") Long id, Model model) {
+    public String editWorkout(@PathVariable("id") Long id, Model model, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName());
         Workout workout = workoutRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ei ole oikea Id:" + id));
+        if (!workout.getUser().getId().equals(user.getId()) && !user.getRole().equals("ROLE_ADMIN")) {
+            return "redirect:/workouts";
+        }
         model.addAttribute("workout", workout);
         return "editworkout";
     }
@@ -111,14 +112,23 @@ public class WorkoutController {
             return "editworkout";
         }
         User user = userRepository.findByUsername(auth.getName());
+        Workout existing = workoutRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ei ole oikea Id:" + id));
+        if (!existing.getUser().getId().equals(user.getId()) && !user.getRole().equals("ROLE_ADMIN")) {
+            return "redirect:/workouts";
+        }
         workout.setId(id);
-        workout.setUser(user);
+        workout.setUser(existing.getUser());
         workoutRepository.save(workout);
         return "redirect:/workouts";
     }
 
     @GetMapping("/workouts/delete/{id}")
-    public String deleteWorkout(@PathVariable("id") Long id) {
+    public String deleteWorkout(@PathVariable("id") Long id, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName());
+        Workout workout = workoutRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ei ole oikea Id:" + id));
+        if (!workout.getUser().getId().equals(user.getId()) && !user.getRole().equals("ROLE_ADMIN")) {
+            return "redirect:/workouts";
+        }
         workoutRepository.deleteById(id);
         return "redirect:/workouts";
     }  
@@ -131,7 +141,10 @@ public class WorkoutController {
         return "redirect:/workouts";
         }
     
+        User targetUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Ei löydy: " + userId));
         model.addAttribute("workouts", workoutRepository.findByUserId(userId));
+        model.addAttribute("username", targetUser.getUsername());
+        model.addAttribute("userId", userId);
         return "workouts";
     }
 }

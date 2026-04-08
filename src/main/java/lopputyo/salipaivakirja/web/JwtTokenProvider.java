@@ -14,7 +14,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtTokenProvider {
 
     private final SecretKey key;
-    private final long expiration = 864_000_000; // 24 tuntia
+    private final long expiration = 86_400_000; // 24 tuntia
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secret) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());

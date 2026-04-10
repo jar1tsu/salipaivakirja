@@ -2,6 +2,7 @@ package lopputyo.salipaivakirja.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +28,7 @@ private Long id;
 @Size(min = 3, max = 50, message = "Käyttäjätunnuksen tulee olla 3-50 merkkiä pitkä")
 private String username;
 
+@JsonIgnore
 @Column(nullable = false)
 @NotBlank(message = "Salasana ei saa olla tyhjä")
 @Size(min = 5, message = "Salasanan tulee olla vähintään 5 merkkiä pitkä")

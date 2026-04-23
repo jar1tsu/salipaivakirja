@@ -40,7 +40,8 @@ public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
                 request.get("password")
             )
         );
-        String token = jwtTokenProvider.generateToken(auth.getName());
+        User user = userRepository.findByUsername(auth.getName());
+        String token = jwtTokenProvider.generateToken(auth.getName(), user.getId());
         return ResponseEntity.ok(Map.of("token", token));
     } catch (Exception e) {
         return ResponseEntity.status(401).body(Map.of("error", "Väärä käyttäjätunnus tai salasana"));

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -73,6 +74,19 @@ public class ExerciseSetRestController {
         existing.setWeight(updatedSet.getWeight());
         existing.setReps(updatedSet.getReps());
         existing.setCompleted(updatedSet.getCompleted());
+        return exerciseSetRepository.save(existing);
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ExerciseSet completeSet(@PathVariable Long id, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName());
+        ExerciseSet existing = exerciseSetRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ei löydy: " + id));
+        if (!existing.getExercise().getWorkout().getUser().getId().equals(user.getId())
+                && !user.getRole().equals("ROLE_ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ei oikeuksia");
+        }
+        existing.setCompleted(true);
         return exerciseSetRepository.save(existing);
     }
 

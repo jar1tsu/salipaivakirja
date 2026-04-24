@@ -60,6 +60,18 @@ public class SecurityConfig {
                 return config;
             }))
             .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/auth/**", "/login", "/register", "/error").permitAll()
+                .requestMatchers("/api/workouts/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COACH")
+                .anyRequest().authenticated())
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/workouts", true)
+                .permitAll())
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login")
+                .permitAll())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
                     if (request.getRequestURI().startsWith("/api/")) {
@@ -71,18 +83,6 @@ public class SecurityConfig {
                     }
                 })
             )
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/auth/**", "/login", "/register").permitAll()
-                .requestMatchers("/api/workouts/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COACH")
-                .anyRequest().authenticated())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/workouts", true)
-                .permitAll())
-            .logout(logout -> logout
-                .logoutSuccessUrl("/login")
-                .permitAll())
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -41,6 +41,7 @@ private String email;
 @Column(nullable = false)
 private String role;
 
+@JsonIgnore
 @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 private List<Workout> workouts;
 

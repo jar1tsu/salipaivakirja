@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -38,7 +37,7 @@ public class Exercise {
 
     public Exercise() {}
 
-    public Exercise(@JsonProperty("name") String name) {
+    public Exercise(String name) {
         this.name = name;
     }
 

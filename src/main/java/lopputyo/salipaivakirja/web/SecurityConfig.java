@@ -2,9 +2,9 @@ package lopputyo.salipaivakirja.web;
 
 import java.util.List;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -12,13 +12,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -52,10 +50,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/api/**")
             .cors(cors -> cors.configurationSource(request -> {
                 var config = new CorsConfiguration();
                 config.setAllowedOrigins(List.of("*"));
@@ -63,35 +59,25 @@ public class SecurityConfig {
                 config.setAllowedHeaders(List.of("*"));
                 return config;
             }))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**"))
+            .exceptionHandling(ex -> ex
+                .defaultAuthenticationEntryPointFor(
+                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                    request -> request.getRequestURI().startsWith("/api/")))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**", "/login", "/register").permitAll()
                 .requestMatchers("/api/workouts/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COACH")
                 .anyRequest().authenticated())
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
-                .requestMatchers("/workouts/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COACH")
-                .anyRequest().authenticated())
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .httpBasic(Customizer.withDefaults())
             .formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/workouts", true)
                 .permitAll())
             .logout(logout -> logout
                 .logoutSuccessUrl("/login")
-                .permitAll());
+                .permitAll())
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

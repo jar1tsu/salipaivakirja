@@ -59,8 +59,7 @@ public class SecurityConfig {
                 config.setAllowedHeaders(List.of("*"));
                 return config;
             }))
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers(request -> request.getRequestURI().startsWith("/api/")))
+            .csrf(csrf -> csrf.disable())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
                     if (request.getRequestURI().startsWith("/api/")) {

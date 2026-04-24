@@ -4,15 +4,19 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -40,30 +44,46 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
+            .securityMatcher("/api/**")
             .cors(cors -> cors.configurationSource(request -> {
-            var config = new CorsConfiguration();
-            config.setAllowedOrigins(List.of("*"));
-            config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
-            config.setAllowedHeaders(List.of("*"));
-            return config;
-        }))
-            .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/login", "/register", "/api/auth/**").permitAll()
+                var config = new CorsConfiguration();
+                config.setAllowedOrigins(List.of("*"));
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
+                config.setAllowedHeaders(List.of("*"));
+                return config;
+            }))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/workouts/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COACH")
+                .anyRequest().authenticated())
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/workouts/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COACH")
                 .anyRequest().authenticated())
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .httpBasic(Customizer.withDefaults())
-            .csrf((csrf) -> csrf.disable())
-            .formLogin((form) -> form
+            .formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/workouts", true)
                 .permitAll())
-            .logout((logout) -> logout
+            .logout(logout -> logout
                 .logoutSuccessUrl("/login")
-                .permitAll())
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .permitAll());
 
         return http.build();
     }

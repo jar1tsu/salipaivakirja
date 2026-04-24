@@ -2,6 +2,7 @@ package lopputyo.salipaivakirja.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
@@ -27,6 +28,7 @@ public class Exercise {
     @JoinColumn(name = "workout_id", nullable = false)
     private Workout workout;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "exercise", cascade = CascadeType.ALL)
     private List<ExerciseMuscleGroup> muscleGroups;
 

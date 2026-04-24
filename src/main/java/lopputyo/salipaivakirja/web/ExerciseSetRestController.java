@@ -58,6 +58,7 @@ public class ExerciseSetRestController {
         if (!exercise.getWorkout().getUser().getId().equals(user.getId()) && !user.getRole().equals("ROLE_ADMIN")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ei oikeuksia");
         }
+        exerciseSet.setExercise(exercise);
         return exerciseSetRepository.save(exerciseSet);
     }
 

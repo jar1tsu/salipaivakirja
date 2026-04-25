@@ -23,7 +23,7 @@ public class UserRestController {
     @GetMapping
     public Iterable<User> getUsers(Authentication auth) {
         User user = userRepository.findByUsername(auth.getName());
-        if (!user.getRole().equals("ROLE_ADMIN") && !user.getRole().equals("ROLE_COACH")) {
+        if (!user.getRole().equals("ROLE_ADMIN")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ei oikeuksia");
         }
         return userRepository.findAll();

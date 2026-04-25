@@ -79,7 +79,8 @@ public class ExerciseController {
             return "redirect:/exercises";
         }
 
-        Exercise exercise = new Exercise(name);
+        Exercise exercise = new Exercise();
+        exercise.setName(name);
         exercise.setWorkout(workout);
         exerciseRepository.save(exercise);
 

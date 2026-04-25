@@ -87,7 +87,7 @@ public class ExerciseSetRestController {
                 && !user.getRole().equals("ROLE_ADMIN")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ei oikeuksia");
         }
-        existing.setCompleted(true);
+        existing.setCompleted(!Boolean.TRUE.equals(existing.getCompleted()));
         return exerciseSetRepository.save(existing);
     }
 
